@@ -2,9 +2,9 @@
 
 **Arifur Rahman Tuhin** · Software QA Engineer · [@tuhin-swe](https://github.com/tuhin-swe)
 **Project:** Ready Laundry, a multi-vendor laundry platform (Laravel 10): customer website, admin panel, shop panel, and the API used by the customer, shop and driver apps.
-**Period:** 25 Oct – 9 Nov 2026
+**Period:** 25 Oct – 10 Nov 2026
 
-I tested the whole platform as every kind of user, wrote each issue up in a bug report, and fixed the issues one by one on a separate `qa` branch. Every fix was checked in a real browser before I marked it fixed. At the end I wrote an automated end-to-end test suite (Playwright, 134 tests) that plays each role, and a short load test (k6). Both pass.
+I tested the whole platform as every kind of user, wrote each issue up in a bug report, and fixed the issues one by one on a separate `qa` branch. Every fix was checked in a real browser before I marked it fixed. At the end I wrote an automated end-to-end test suite (Playwright, 326 tests) that plays each role, and a short load test (k6). Both pass.
 
 > The bug report itself is a private Google Sheet with four tabs: `Summary`, `Website` (WEB-xx), `Admin Panel` (AD-xx) and `Shop Panel` (SHOP-xx). The IDs below point to its rows. This page shows my work; no company data, code or credentials are included. The screenshots use demo data from a local copy.
 
@@ -14,16 +14,16 @@ I tested the whole platform as every kind of user, wrote each issue up in a bug 
 
 | | |
 |---|---|
-| Items logged and fixed | **184**: Website 54, Admin Panel 71, Shop Panel 59 |
-| By type | **136 bugs** · **46 new features** · 2 design improvements |
-| Severity | Critical 21 · Major 75 · Minor 84 · Trivial 2 |
-| Priority | High 75 · Medium 86 · Low 23 |
-| Code changes | **212 commits** on the `qa` branch · 366 files |
-| Languages | English, Bangla and Arabic: 2,336 panel texts and the whole website |
-| Automated tests | **134 end-to-end tests, all passing** (guest, customer, shop owner, shop staff, admin, driver app API) |
+| Items logged and fixed | **211**: Website 57, Admin Panel 81, Shop Panel 73 |
+| By type | **152 bugs** · **53 new features** · 6 improvements |
+| Severity | Critical 28 · Major 87 · Minor 92 · Trivial 2 |
+| Priority | High 90 · Medium 97 · Low 24 |
+| Code changes | **240 commits** on the `qa` branch · 404 files |
+| Languages | English, Bangla and Arabic: 2,581 panel texts and the whole website |
+| Automated tests | **326 end-to-end tests, all passing**, plus 1 skipped on purpose (every role, the forms, the app APIs, money, reports, activity log) |
 | Load test | 50 visitors at once plus the app API: **0 errors**, 95% of pages in under 0.25 s |
 
-All 184 items are marked *QA: Retest / DEV: Fixed* and wait for final verification. Every row has the same columns: ID, module, title, description, steps, test data, expected and actual result, severity, priority, environment, statuses, who fixed it, attachment, reporter and type.
+All 211 items are marked *QA: Retest / DEV: Fixed* and wait for final verification. Every row has the same columns: ID, module, title, description, steps, test data, expected and actual result, severity, priority, environment, statuses, who fixed it, attachment, reporter and type.
 
 ## How I worked
 
@@ -40,18 +40,28 @@ All 184 items are marked *QA: Retest / DEV: Fixed* and wait for final verificati
 
 I wrote the suite in TypeScript with Playwright. The test code stays with the project, so it is not published here; this section shows what it covers and the results.
 
-![Playwright report: 134 passed](screenshots/test-01-playwright-report.jpg)
+![Playwright report: 326 passed, 1 skipped](screenshots/test-01-playwright-report.jpg)
 
-### End-to-end tests (Playwright) — 134 tests, all passing
+### End-to-end tests (Playwright) — 326 tests, all passing
 
-| Role | Tests | What is covered |
+| Area | Tests | What is covered |
 |---|---:|---|
-| Guest | 21 | Every public page opens, Bangla home page, home page on a phone. Dashboard pages ask to sign in. The public shop map shows no emails or phones. A wrong password is refused. A driver cannot sign in to the dashboard. |
-| Customer | 11 | Every account page. **A real order from start to end**: service → cart → checkout (address, pickup and delivery times, cash on delivery) → the order is in My orders with the shop's order number. Order counts add up. Search finds the order. Another customer's order never shows. |
-| Shop owner | 39 | Dashboard (and on a phone). **An order moved one step at a time**: only the next step is offered. Skipping a step through the link is refused. Picked up asks for a driver in a popup. Assigning a driver does not change the status. No going back, and no Cancel after pickup. Another shop's order cannot be touched. **A POS cash sale** with change and a receipt. The online payment page. The driver page uses the admin's payout methods. The weekly time slots form saves. A staff member is added. Every menu page opens. |
-| Shop staff | 9 | The staff member added above signs in and sees only orders. No money figures and no Products, Drivers or Staff menu. Closed pages show the "no access" page. Order statuses cannot be changed. |
-| Admin | 47 | Dashboard (and on a phone). **In Bangla the dashboard is fully Bangla**, dates too. Driver payout methods: add, refuse to hide them all, remove. Every one of 41 menu pages opens. |
-| Driver app API | 7 | Sign in, wrong password, 401 without a token, account, payment requests with the admin's methods, validation, orders list. |
+| Guest | 22 | Every public page opens, Bangla home page, home page on a phone. Dashboard pages ask to sign in. The public shop map shows no emails or phones. A wrong password is refused. A driver cannot sign in to the dashboard. The first-run "create super admin" page stays closed. |
+| Customer | 12 | Every account page. **A real order from start to end**: service → cart → checkout → My orders with the shop's order number. Order counts add up. Another customer's order never shows. The header icons are in order and one size. |
+| Customer, whole life | 30 | Register, sign in, forgot password with a one-time code, settings, addresses, favourites, reviews (one per delivered order), notification switches. |
+| Shop owner | 44 | **An order moved one step at a time**, with the full step menu. **A POS cash sale**, an empty "cash received" left unpaid, part payment. The orders list: new-orders count, date filter, sales totals. Another shop's order cannot be touched. Staff, time slots, every menu page. |
+| Shop staff | 9 | Sees only what the owner allowed. No money figures. Closed pages show the "no access" page. |
+| Admin | 51 | Dashboard (and on a phone), Bangla dashboard, payout methods, every menu page. **The admin sees orders and drivers but cannot change a shop's orders, cash or pay.** |
+| Forms | 53 | Every add and edit form in the shop and admin panels: saved values, wrong values refused, no server errors. |
+| App APIs | 30 | Customer and shop app APIs: own data only, totals worked out on the server, cancel and search. |
+| Driver app API | 7 | Sign in, account, payment requests with the admin's methods, orders list. |
+| Money and exports | 25 | Every money line of an order (commission, driver pay, what the shop keeps), wallet, withdrawals, PDF and Excel exports. |
+| Shop reports | 22 | The seven shop reports: every total checked against the database, phone width, Excel download, staff see only the reports they were given. |
+| Admin reports | 14 | Commission by shop, drivers by shop, business by area, customers, subscriptions: every total checked against the database; shops cannot open them. |
+| Activity log | 6 | Changes are logged with who, shop and result; refused attempts too; no passwords kept; a shop sees only its own lines; lines cannot be changed or deleted. |
+| Menu | 2 | The side menu order for the admin and the shop owner. |
+
+One more test is skipped on purpose (counted in Customer, whole life above): the website has no order cancel for customers yet, so its test waits for that feature.
 
 **Every test also fails on any script error in the browser or any 5xx answer from the server.** Several bugs below were found this way, not by the thing the test was looking at.
 
@@ -65,6 +75,9 @@ I wrote the suite in TypeScript with Playwright. The test code stays with the pr
 | SHOP-59 | shop test | **POS online payment page** (used by the shop app): a 500 error, a slow lookup that read far more data than it needed, and a script error whenever Stripe posted a message. |
 | AD-70 | guest test | A signed-out dashboard link (a bookmark) opened the **customer website** instead of the sign-in, and after signing in the page asked for was lost. |
 | AD-71 | admin test | Settings > Social link threw `$ is not defined` on every visit. |
+| AD-74, SHOP-61 | forms tests | Admin and shop forms accepted wrong values (negative or decimal prices, empty names) or showed an error page. |
+| SHOP-65 | shop test | The shop dashboard did not count POS sales in its order figures. |
+| AD-81 | guest test | The first-run "create super admin" page showed an error page once a super admin existed (it now goes to the sign-in). |
 
 ### Load test (k6) — passed
 
@@ -102,6 +115,10 @@ The test server was the project on Apache with OPcache and debug off, like produ
 | **Location** | WEB-39 … WEB-41, SHOP-33 … SHOP-35, SHOP-44, SHOP-45, AD-59 … AD-61 | Visitor location and nearest stores, delivery areas drawn on a map, shop location from where the shop is now, the admin's map of all shops. |
 | **Dark mode** | AD-43, WEB-37 | Light and dark mode for the panel and the website. |
 | **Messages and notifications** | AD-57, WEB-46, AD-66 | Contact form messages reach the admin, customers get notifications on the website, and the admin is told when a shop asks for a new service. |
+| **Shop reports** | SHOP-71 … SHOP-73 | Online sales, POS sales, customers with a customer ledger, top services, drivers, daily closing and commission. Dates, totals, Print and Excel on each; staff get only the reports the owner ticks. |
+| **Admin reports** | AD-76, AD-79 | Commission by shop (with each shop's ledger), drivers by shop, business by area, customers and subscriptions (who paid when, active plans, income by month). |
+| **Activity log** | AD-77 | Who did what, where and when, for the admin and for every shop. Refused attempts are logged too. Lines can never be changed or deleted. |
+| **Clear roles** | AD-75, AD-78 | The admin sees every shop's orders and drivers; only the shop changes its orders, takes payment and handles its drivers' cash and pay. |
 
 | Admin: driver payout methods, with a live preview | POS sale page with its steps |
 |---|---|
@@ -110,6 +127,28 @@ The test server was the project on Apache with OPcache and debug off, like produ
 | ![Bangla](screenshots/admin-12-dashboard-bangla.jpg) | ![Arabic](screenshots/admin-13-dashboard-arabic.jpg) |
 | **A driver asks for their pay** | **Weekly pickup times** |
 | ![Payment request](screenshots/shop-20-driver-payment-request.jpg) | ![Times](screenshots/shop-21-pickup-times.jpg) |
+
+## The last round (10 Nov): reports, activity log and clear roles
+
+**Shop reports (SHOP-71 … SHOP-73).** A shop now sees its business without a spreadsheet: online and POS sales day by day, what each customer bought and still owes (a ledger with a running balance), which services sell most, what each driver did and holds in cash, a daily closing (cash in the drawer and tomorrow's work) and the platform commission line by line. Every total is checked against the database by the tests.
+
+**Admin reports (AD-76, AD-79).** Commission earned from each shop and what each still owes, every shop's drivers, which areas bring business, all customers with their spending and dues, and subscriptions: who paid when, which plans are active or ending soon, and income by plan and by month.
+
+**Activity log (AD-77).** Every change on the website, the panels and the app APIs writes a line: who, which shop, what, where from and the result. Refused attempts are logged too. Passwords, codes and card details are never kept. Lines cannot be changed or deleted: there is no such page, the app refuses it, and the database refuses it.
+
+**Clear roles (AD-75, AD-78).** The platform admin sees every shop's orders and drivers but no longer changes them: taking payment, moving an order and handling a driver's cash and pay are the shop's work.
+
+**Smaller fixes (SHOP-64 … SHOP-70, WEB-57, AD-80).** An empty "cash received" in the POS now means unpaid, and money is taken at handover. An online order can no longer share a number with a POS sale. The order page shows every step again, even after delivery. The orders list has a new-orders count, an online / POS switch, a date filter and sales totals. The website header and both side menus are in a clear order.
+
+| Shop: online sales report | Shop: daily closing |
+|---|---|
+| ![Online sales](screenshots/shop-25-report-online-sales.jpg) | ![Daily closing](screenshots/shop-26-report-daily-closing.jpg) |
+| **Shop: commission, line by line** | **Shop: orders with date filter and totals** |
+| ![Commission](screenshots/shop-27-report-commission.jpg) | ![Orders](screenshots/shop-24-orders-totals.jpg) |
+| **Admin: commission by shop** | **Admin: business by area** |
+| ![Commission by shop](screenshots/admin-14-commission-by-shop.jpg) | ![Areas](screenshots/admin-15-business-by-area.jpg) |
+| **Admin: subscriptions** | **Activity log (a shop's view)** |
+| ![Subscriptions](screenshots/admin-16-subscriptions.jpg) | ![Activity log](screenshots/shop-28-activity-log.jpg) |
 
 ## How I made the user experience better
 
@@ -120,6 +159,7 @@ The test server was the project on Apache with OPcache and debug off, like produ
 - **Nobody lands on the wrong page.** Signed-out dashboard links go to the sign-in and back to the page. Customers go to the website sign-in. Staff and drivers get a clear "not for this account" page instead of a bare 403.
 - **Works on a phone, in the dark and in every language.** I checked pages at 390 px wide, in dark mode and in Bangla and Arabic. Placeholders, dates and roles are translated too.
 - **Calm interface.** No sliding panels or jumping layouts. Rows open pages, forms start under the header, and pages paint once instead of flashing.
+- **Each role does its own work.** The admin sees and reports; the shop takes payment and moves orders. Menus put the most used pages first.
 - **Forms that help.** A red * on every required field. One image upload box that shows the saved image. Quick choices like "+1 day" and "use Saturday's times for every day".
 
 ---
@@ -128,7 +168,7 @@ The test server was the project on Apache with OPcache and debug off, like produ
 
 ### Security issues found and fixed
 
-I found and fixed **14 security issues**: pages and API calls that worked without signing in, one shop or driver able to see or change another's data, customers able to reach other customers' orders and invoices, prices trusted from the browser, and payments marked paid before they were verified. The exact pages are left out here on purpose.
+I found and fixed **23 security issues**: pages and API calls that worked without signing in, one shop or driver able to see or change another's data, customers able to reach other customers' orders and invoices, prices trusted from the browser, and payments marked paid before they were verified. The exact pages are left out here on purpose.
 
 ### Shop panel: a POS a shop can really use (SHOP-30, SHOP-31)
 
@@ -449,12 +489,40 @@ Each commit on the `qa` branch (all authored by Arifur Rahman Tuhin, [@tuhin-swe
 | 201 | 2026-11-08 | `c704db6f` | feat(SHOP-56): drivers ask the shop for their pay; payments keep method and TrxID |
 | 202 | 2026-11-08 | `0f02d62c` | fix(AD-67): security fix (access control) |
 | 203 | 2026-11-08 | `16641695` | feat(SHOP-57): pickup and delivery times on one simple weekly form |
-| 204 | 2026-11-09 | `24b89064` | fix(SHOP-58): order status moves one step forward only |
-| 205 | 2026-11-09 | `03155b27` | feat(AD-68): driver payout methods are set by the admin, not fixed in code |
-| 206 | 2026-11-09 | `115fd7a2` | style(AD-68): clearer driver payout methods page |
-| 207 | 2026-11-09 | `113ee091` | fix(AD-69): the panel shows English in Bangla and Arabic |
-| 208 | 2026-11-09 | `65604b81` | fix(WEB-53): website headings stay English on the test server in Bangla / Arabic |
-| 209 | 2026-11-09 | `5a2bea99` | fix(AD-70): dashboard links sent guests to the website home, not the sign-in |
-| 210 | 2026-11-09 | `82fc7e82` | fix(WEB-54): security fix (access control) |
-| 211 | 2026-11-09 | `a48ca829` | fix(AD-71): script error on Settings > Social link |
-| 212 | 2026-11-09 | `71fc6cea` | fix(SHOP-59): POS online payment page crashed and was slow |
+| 204 | 2026-11-09 | `a5945004` | fix(SHOP-58): order status moves one step forward only |
+| 205 | 2026-11-09 | `c41726c2` | feat(AD-68): driver payout methods are set by the admin, not fixed in code |
+| 206 | 2026-11-09 | `64f34114` | style(AD-68): clearer driver payout methods page |
+| 207 | 2026-11-09 | `84f4f88c` | fix(AD-69): the panel shows English in Bangla and Arabic |
+| 208 | 2026-11-09 | `f0136caf` | fix(WEB-53): website headings stay English on the test server in Bangla / Arabic |
+| 209 | 2026-11-09 | `276da494` | fix(AD-70): dashboard links sent guests to the website home, not the sign-in |
+| 210 | 2026-11-09 | `b35d1743` | fix(WEB-54): security fix (access control) |
+| 211 | 2026-11-09 | `0d1ad54a` | fix(AD-71): script error on Settings > Social link |
+| 212 | 2026-11-09 | `bb4f77ae` | fix(SHOP-59): POS online payment page crashed and was slow |
+| 213 | 2026-11-09 | `b2f92676` | fix(AD-72): admin profile page showed only the name and email |
+| 214 | 2026-11-09 | `33bf7ae8` | fix(SHOP-60): security fix (access control) |
+| 215 | 2026-11-09 | `e04319f9` | fix(WEB-55): security fix (access control) |
+| 216 | 2026-11-09 | `72ef066b` | fix(AD-73): security fix (access control) |
+| 217 | 2026-11-09 | `0c32580a` | fix(SHOP-61): shop forms - negative and decimal prices; security fix (access control) |
+| 218 | 2026-11-09 | `83071099` | fix(AD-74): admin forms accepted bad values or answered 500 |
+| 219 | 2026-11-10 | `d2747954` | fix(WEB-56): security fix (access control) |
+| 220 | 2026-11-10 | `69bfccea` | fix(SHOP-62): security fix (access control) |
+| 221 | 2026-11-10 | `4be61fbc` | fix(SHOP-63): security fix (access control) |
+| 222 | 2026-11-10 | `be9f873f` | fix(SHOP-64): POS - an empty "Cash received" counted as paid in full |
+| 223 | 2026-11-10 | `04084e17` | fix(SHOP-65): shop dashboard ignored POS sales in its order counts |
+| 224 | 2026-11-10 | `5ae140b2` | feat(SHOP-66): Online orders / POS orders switch on both order lists |
+| 225 | 2026-11-10 | `ea9dfd8a` | fix(SHOP-67): an online order could get the same number as a POS sale |
+| 226 | 2026-11-10 | `303cdb07` | fix(SHOP-68): POS money is taken at handover, and a sale's row opens the sale |
+| 227 | 2026-11-10 | `3494a5fe` | fix(SHOP-69): order status menu lists every step again and stays after delivery |
+| 228 | 2026-11-10 | `1915c5aa` | feat(SHOP-70): menu "Orders" shows how many new orders wait |
+| 229 | 2026-11-10 | `09a5df13` | feat(SHOP-71): online orders get a date filter and sales totals, like POS sales |
+| 230 | 2026-11-10 | `c393c091` | feat(SHOP-72): shop reports - online sales, POS sales, customers and ledger, top services, drivers, daily closing |
+| 231 | 2026-11-10 | `6204e796` | feat(SHOP-73): commission report in detail; reports lose the second menu |
+| 232 | 2026-11-10 | `768c08a7` | style(WEB-57): website header icons in the usual order, one size and one badge style |
+| 233 | 2026-11-10 | `e63756f1` | fix(AD-75): the admin sees orders but no longer runs a shop's orders |
+| 234 | 2026-11-10 | `cbaecd41` | feat(AD-76): admin reports - commission by shop, drivers by shop, business by area, customers |
+| 235 | 2026-11-10 | `d5e8d029` | feat(AD-77): activity log for the admin and the shops - who did what, where and when; lines cannot be deleted |
+| 236 | 2026-11-10 | `c21468eb` | fix(AD-78): the admin sees a shop's drivers but no longer handles their cash and pay |
+| 237 | 2026-11-10 | `ca07aa16` | style(AD-77): Activity log moves into the Settings menu |
+| 238 | 2026-11-10 | `2da6f703` | feat(AD-79): admin subscription report - who paid when, active shops, income by plan and month |
+| 239 | 2026-11-10 | `b9273b88` | style(AD-80): side menu ordered by importance for the admin and the shops |
+| 240 | 2026-11-10 | `b0eaf264` | fix(AD-81): the first-run "create super admin" page gave a 500 once a super admin exists |
